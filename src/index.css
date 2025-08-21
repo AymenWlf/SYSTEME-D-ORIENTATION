@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Styles d'impression pour format A4 */
+@media print {
+  @page {
+    size: A4;
+    margin: 1.5cm 1cm 1.5cm 1cm;
+  }
+  
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+    color: #000 !important;
+    background: white !important;
+  }
+  
+  /* Éviter les coupures dans les éléments importants */
+  .print\:break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  
+  .print\:break-before-page {
+    break-before: page;
+    page-break-before: always;
+  }
+  
+  .print\:break-after-avoid {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  
+  /* Optimisation des graphiques pour l'impression */
+  svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+  
+  /* Amélioration de la lisibilité */
+  h1, h2, h3, h4, h5, h6 {
+    color: #000 !important;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  
+  /* Optimisation des tableaux et listes */
+  table, ul, ol {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  
+  /* Masquer les éléments non nécessaires à l'impression */
+  .print\:hidden {
+    display: none !important;
+  }
+  
+  /* Ajustements des couleurs pour l'impression */
+  .bg-gradient-to-r {
+    background: #f8f9fa !important;
+  }
+  
+  /* Bordures pour délimiter les sections */
+  .print\:border {
+    border: 1px solid #dee2e6 !important;
+  }
+  
+  /* Espacement optimisé */
+  .print\:space-y-6 > * + * {
+    margin-top: 1.5rem !important;
+  }
+  
+  /* Tailles de police adaptées */
+  .print\:text-xs {
+    font-size: 10pt !important;
+  }
+  
+  .print\:text-sm {
+    font-size: 11pt !important;
+  }
+  
+  .print\:text-base {
+    font-size: 12pt !important;
+  }
+  
+  .print\:text-xl {
+    font-size: 16pt !important;
+  }
+  
+  .print\:text-2xl {
+    font-size: 18pt !important;
+  }
+}
