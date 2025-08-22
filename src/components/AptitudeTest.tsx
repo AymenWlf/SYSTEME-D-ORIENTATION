@@ -1138,6 +1138,70 @@ const AptitudeTest: React.FC<AptitudeTestProps> = ({ onComplete, onPrevious, can
   const currentTestKey = testKeys[currentTest];
   const currentTestData = aptitudeTests[currentTestKey as keyof typeof aptitudeTests];
   const t = translations[language as 'fr' | 'ar'] || translations.fr;
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+
+  // Modifiez la fonction handleAnswer pour séparer la sélection et la validation
+  const selectOption = (optionIndex: number) => {
+    setSelectedOption(optionIndex);
+  };
+
+
+  // Nouvelle fonction pour confirmer la réponse et passer à la question suivante
+  const confirmAnswer = () => {
+    if (selectedOption === null) return; // Ne rien faire si aucune option n'est sélectionnée
+
+    const questionKey = `${currentTestKey}_${currentQuestion}`;
+    const responseTime = Date.now() - questionStartTime;
+    const questions = currentTestData.questions[language as 'fr' | 'ar'] || currentTestData.questions.fr;
+    const question = questions[currentQuestion];
+
+    // Enregistrer la réponse simple
+    setAnswers(prev => ({ ...prev, [questionKey]: selectedOption }));
+
+    // Enregistrer la réponse détaillée
+    if (question) {
+      const isCorrect = selectedOption === question.correct;
+      const questionResponse: QuestionResponse = {
+        questionId: questionKey,
+        questionText: question.question,
+        userAnswer: selectedOption,
+        correctAnswer: question.correct,
+        isCorrect,
+        responseTime,
+        timestamp: new Date(),
+        testType: currentTestKey,
+        questionIndex: currentQuestion,
+        selectedOption: question.options[selectedOption] || '',
+        correctOption: question.options[question.correct] || ''
+      };
+
+      setDetailedResponses(prevResponses => ({
+        ...prevResponses,
+        [currentTestKey]: [
+          ...(prevResponses[currentTestKey] || []),
+          questionResponse
+        ]
+      }));
+
+      console.log(`💡 Aptitude Response Captured:`, {
+        test: currentTestKey,
+        question: currentQuestion + 1,
+        correct: isCorrect ? '✅' : '❌',
+        responseTime: `${responseTime}ms`,
+        userAnswer: question.options[selectedOption],
+        correctAnswer: question.options[question.correct]
+      });
+    }
+
+    // Passer à la question suivante ou terminer le test
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+      setSelectedOption(null); // Réinitialiser l'option sélectionnée
+      setQuestionStartTime(Date.now());
+    } else {
+      handleTestComplete();
+    }
+  };
 
 
   useEffect(() => {
@@ -2326,17 +2390,36 @@ const AptitudeTest: React.FC<AptitudeTestProps> = ({ onComplete, onPrevious, can
           {question.options.map((option, index) => (
             <button
               key={index}
-              onClick={() => handleAnswer(index)}
-              className={`p-4 border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all text-gray-800 font-medium ${language === 'ar' ? 'text-right' : 'text-left'
+              onClick={() => selectOption(index)}
+              className={`p-4 border-2 ${selectedOption === index
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-gray-300 hover:border-blue-500 hover:bg-blue-50'
+                } rounded-lg transition-all text-gray-800 font-medium ${language === 'ar' ? 'text-right' : 'text-left'
                 }`}
             >
-              <span className={`inline-flex items-center justify-center w-8 h-8 bg-gray-200 text-gray-700 rounded-full font-semibold ${language === 'ar' ? 'ml-3' : 'mr-3'
+              <span className={`inline-flex items-center justify-center w-8 h-8 ${selectedOption === index
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-gray-700'
+                } rounded-full font-semibold ${language === 'ar' ? 'ml-3' : 'mr-3'
                 }`}>
                 {String.fromCharCode(65 + index)}
               </span>
               {option}
             </button>
           ))}
+
+          <div className="mt-6 flex justify-end">
+            <button
+              onClick={confirmAnswer}
+              disabled={selectedOption === null}
+              className={`px-6 py-3 rounded-lg font-medium ${selectedOption === null
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-blue-600 text-white hover:bg-blue-700'
+                } transition-all`}
+            >
+              {language === 'ar' ? 'التالي' : 'Suivant'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

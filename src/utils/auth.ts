@@ -29,8 +29,8 @@ export const isTokenValid = (token: string): boolean => {
     const currentTime = Math.floor(Date.now() / 1000);
     if (payload.exp < currentTime) return false;
 
-    // Vérifier si l'utilisateur a le rôle 'ROLE_ADMIN'
-    if (!payload.roles || !payload.roles.includes('ROLE_ADMIN')) {
+    // Vérifier si l'utilisateur a le rôle 'ROLE_AUTHENTICATED'
+    if (!payload.roles || !payload.roles.includes('ROLE_AUTHENTICATED')) {
         return false;
     }
 
@@ -45,7 +45,7 @@ export const getUserFromToken = (token: string): User | null => {
         // Le champ userId n'existe plus, donc on remplace par username
         id: payload.username,  // Ici on utilise `username` qui est dans le payload
         email: payload.email,  // L'email est récupéré depuis le payload (si disponible)
-        role: payload.roles.includes('ROLE_ADMIN') ? 'admin' : 'user',  // Assignation du rôle basé sur les rôles
+        role: payload.roles.includes('ROLE_AUTHENTICATED') ? 'admin' : 'user',  // Assignation du rôle basé sur les rôles
         name: payload.username,  // Vous pouvez ajouter ici d'autres informations comme le nom, selon ce qui est stocké dans le token
     };
 };

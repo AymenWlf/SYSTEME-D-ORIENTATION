@@ -97,6 +97,34 @@ const translations = {
     }
 };
 
+// Ajout d'un dictionnaire de traduction pour les spécialités du Bac Mission
+const bacMissionSpecialites = {
+    fr: {
+        math: 'Mathématiques',
+        pc: 'Physique-Chimie',
+        svt: 'SVT (Sciences de la Vie et de la Terre)',
+        nsi: 'Numérique et Sciences Informatiques (NSI)',
+        ses: 'SES (Sciences Économiques et Sociales)',
+        hggsp: 'HGGSP (Histoire-Géo, Géopolitique, Sciences Politiques)',
+        hlp: 'HLP (Humanités, Littérature, Philosophie)',
+        llce: 'LLCE (Langues, Littératures et Cultures Étrangères)',
+        arts: 'Arts (Théâtre, Musique, Arts Plastiques...)',
+        technologique: 'Technologique (STMG, STI2D, STL, ...)'
+    },
+    ar: {
+        math: 'الرياضيات',
+        pc: 'الفيزياء والكيمياء',
+        svt: 'علوم الحياة والأرض',
+        nsi: 'الرقمية وعلوم الكمبيوتر',
+        ses: 'العلوم الاقتصادية والاجتماعية',
+        hggsp: 'التاريخ والجغرافيا والجيوسياسة والعلوم السياسية',
+        hlp: 'العلوم الإنسانية والأدب والفلسفة',
+        llce: 'اللغات والآداب والثقافات الأجنبية',
+        arts: 'الفنون (المسرح، الموسيقى، الفنون التشكيلية...)',
+        technologique: 'التكنولوجي (STMG، STI2D، STL، ...)'
+    }
+};
+
 // Ajoutez également un dictionnaire pour les langues
 const languages = {
     fr: [
@@ -280,7 +308,25 @@ const t = {
         autonomie: "Autonomie",
         perseverance: "Persévérance",
         creativite: "Créativité",
-        adaptabilite: "Adaptabilité"
+        adaptabilite: "Adaptabilité",
+        controleContinu: "Contrôle Continu",
+        moyenneGenerale: "Moyenne Générale",
+
+        // Catégories RIASEC
+        Realiste: "Réaliste",
+        Investigateur: "Investigateur",
+        Artistique: "Artistique",
+        Social: "Social",
+        Entreprenant: "Entreprenant",
+        Conventionnel: "Conventionnel",
+
+        // Profil RIASEC et personnalité
+        profilDominant: "Profil dominant",
+        specialties: "Spécialités",
+        bacYear: "Année d'obtention",
+        bacPending: "En cours d'obtention",
+        notAvailable: "Non disponible",
+        estimatedAverage: "Moyenne estimée"
     },
     ar: {
         academicGrades: "النتائج الأكاديمية",
@@ -381,7 +427,25 @@ const t = {
         autonomie: "الاستقلالية",
         perseverance: "المثابرة",
         creativite: "الإبداع",
-        adaptabilite: "التكيف"
+        adaptabilite: "التكيف",
+        controleContinu: "المراقبة المستمرة",
+        moyenneGenerale: "المعدل العام",
+
+        // Catégories RIASEC
+        Realiste: "الواقعي",
+        Investigateur: "الباحث",
+        Artistique: "الفني",
+        Social: "الاجتماعي",
+        Entreprenant: "المقاول",
+        Conventionnel: "التقليدي",
+
+        // Profil RIASEC et personnalité
+        profilDominant: "الملف المهيمن",
+        specialties: "التخصصات",
+        bacYear: "سنة الحصول",
+        bacPending: "قيد الإنجاز",
+        notAvailable: "غير متوفر",
+        estimatedAverage: "المعدل التقديري"
     }
 };
 
@@ -850,10 +914,41 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ userData, language = 
                                     <span className="text-secondary">{text.age}: </span>
                                     <span className="bold">{userData.personalInfo?.age}</span>
                                 </div>
-                                <div>
+                                <div className="mb-2">
                                     <span className="text-secondary">{text.bac}: </span>
                                     <span className="bold">{userData.personalInfo?.bacType === "mission" ? "Mission Française" : userData.personalInfo?.bacType}</span>
                                 </div>
+
+                                {/* Afficher les spécialités pour Bac Mission */}
+                                {userData.personalInfo?.bacType === "mission" && userData.personalInfo?.bacSpecialites && userData.personalInfo.bacSpecialites.length > 0 && (
+                                    <div className="mb-2">
+                                        <span className="text-secondary">{text.specialties}: </span>
+                                        <span className="bold">
+                                            {userData.personalInfo.bacSpecialites.map((spe: string, index: number) => (
+                                                <span key={spe}>
+                                                    {index > 0 && ", "}
+                                                    {bacMissionSpecialites[language as 'fr' | 'ar'][spe as keyof typeof bacMissionSpecialites.fr] || spe}
+                                                </span>
+                                            ))}
+                                        </span>
+                                    </div>
+                                )}
+
+                                {/* Afficher l'année d'obtention pour les bacheliers */}
+                                {userData.personalInfo?.studyLevel === 'Bachelier' && (
+                                    <div className="mb-2">
+                                        <span className="text-secondary">{text.bacYear}: </span>
+                                        <span className="bold">{userData.personalInfo?.bacYear || text.notAvailable}</span>
+                                    </div>
+                                )}
+
+                                {/* Indiquer si le bac est en cours */}
+                                {userData.personalInfo?.studyLevel === '2ème année Baccalauréat en cours' && (
+                                    <div className="mb-2">
+                                        <span className="text-secondary">{text.bacYear}: </span>
+                                        <span className="bold">{text.bacPending}</span>
+                                    </div>
+                                )}
                             </div>
                             <div>
                                 <div className="mb-2">
@@ -868,7 +963,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ userData, language = 
                         </div>
                     </div>
 
-                    {/* Photo box avec bordure identique */}
+                    {/* Photo box inchangée */}
                     <div className="photo-box">
                         <span className="text-sm text-gray-500">{text.photoPlaceholder}</span>
                     </div>
@@ -884,10 +979,10 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ userData, language = 
                             <table className="grades-table">
                                 <thead>
                                     <tr>
-                                        <th>Régional</th>
-                                        <th>National</th>
-                                        <th>Contrôle Continu</th>
-                                        <th>Moyenne Générale</th>
+                                        <th>{text.regional}</th>
+                                        <th>{text.national}</th>
+                                        <th>{text.controleContinu}</th>
+                                        <th>{text.moyenneGenerale}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -922,41 +1017,42 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ userData, language = 
                 {userData.personalInfo?.bacType === "mission" && (
                     <div className="card">
                         <div className="mb-2">
-                            <h3 style={{ fontSize: '13pt', fontWeight: 'bold', marginBottom: '10px', color: '#4b5563' }}>{text.notes}</h3>
                             <table className="grades-table">
                                 <thead>
                                     <tr>
-                                        <th>Première</th>
-                                        <th>Terminale</th>
-                                        {(userData.personalInfo?.noteGeneraleBac || userData.personalInfo?.noteGeneraleBacEstimation) && (
-                                            <th>Bac</th>
-                                        )}
-                                        <th>Moyenne Générale</th>
+                                        <th>{text.firstYear}</th>
+                                        <th>{text.finalYear}</th>
+                                        <th>{text.bacAverage}</th>
+                                        <th>{userData.personalInfo?.noteAvailability === "estimation" ? text.estimatedAverage : text.generalAverage}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr>
                                         <td>
                                             {userData.personalInfo?.noteAvailability === "estimation"
-                                                ? userData.personalInfo?.noteGeneralePremiereEstimation
-                                                : userData.personalInfo?.noteGeneralePremiere}/20
+                                                ? `${userData.personalInfo?.noteGeneralePremiereEstimation || "-"}/20`
+                                                : `${userData.personalInfo?.noteGeneralePremiere || "-"}/20`}
                                         </td>
                                         <td>
                                             {userData.personalInfo?.noteAvailability === "estimation"
-                                                ? userData.personalInfo?.noteGeneraleTerminaleEstimation
-                                                : userData.personalInfo?.noteGeneraleTerminale}/20
+                                                ? `${userData.personalInfo?.noteGeneraleTerminaleEstimation || "-"}/20`
+                                                : `${userData.personalInfo?.noteGeneraleTerminale || "-"}/20`}
                                         </td>
-                                        {(userData.personalInfo?.noteGeneraleBac || userData.personalInfo?.noteGeneraleBacEstimation) && (
-                                            <td>
-                                                {userData.personalInfo?.noteAvailability === "estimation"
-                                                    ? userData.personalInfo?.noteGeneraleBacEstimation
-                                                    : userData.personalInfo?.noteGeneraleBac}/20
-                                            </td>
-                                        )}
+                                        <td>
+                                            {userData.personalInfo?.noteAvailability === "estimation"
+                                                ? `${userData.personalInfo?.noteGeneraleBacEstimation || "-"}/20`
+                                                : `${userData.personalInfo?.noteGeneraleBac || "-"}/20`}
+                                        </td>
                                         <td className="bold">
                                             {userData.personalInfo?.noteAvailability === "estimation"
-                                                ? userData.personalInfo?.noteMoyenneGeneraleEstimation
-                                                : userData.personalInfo?.noteMoyenneGenerale}/20
+                                                ? `${((parseFloat(userData.personalInfo?.noteGeneralePremiereEstimation || "0") +
+                                                    parseFloat(userData.personalInfo?.noteGeneraleTerminaleEstimation || "0") +
+                                                    parseFloat(userData.personalInfo?.noteGeneraleBacEstimation || "0")) / 3).toFixed(2)}/20`
+                                                : userData.personalInfo?.noteMoyenneGenerale
+                                                    ? `${userData.personalInfo.noteMoyenneGenerale}/20`
+                                                    : ((parseFloat(userData.personalInfo?.noteGeneralePremiere || "0") +
+                                                        parseFloat(userData.personalInfo?.noteGeneraleTerminale || "0") +
+                                                        parseFloat(userData.personalInfo?.noteGeneraleBac || "0")) / 3).toFixed(2) + "/20"}
                                         </td>
                                     </tr>
                                 </tbody>
@@ -967,36 +1063,38 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ userData, language = 
             </div>
 
             {/* Méthodes de calcul des seuils */}
-            <div className="section no-break">
-                <h2 className="section-title">{text.calculationMethods}</h2>
-                <div className="calculation-methods">
-                    <div className="calculation-title">{text.thresholdCalculation}</div>
-                    <div className="calculation-row">
-                        <div className="calculation-method">{text.calculationMethod1}</div>
-                        <div className="calculation-score">
-                            {userData.personalInfo?.noteAvailability === "estimation"
-                                ? userData.personalInfo?.noteCalculeeMethod1Estimation
-                                : userData.personalInfo?.noteCalculeeMethod1}/20
+            {userData.personalInfo?.bacType === "marocain" && (
+                <div className="section no-break">
+                    <h2 className="section-title">{text.calculationMethods}</h2>
+                    <div className="calculation-methods">
+                        <div className="calculation-title">{text.thresholdCalculation}</div>
+                        <div className="calculation-row">
+                            <div className="calculation-method">{text.calculationMethod1}</div>
+                            <div className="calculation-score">
+                                {userData.personalInfo?.noteAvailability === "estimation"
+                                    ? userData.personalInfo?.noteCalculeeMethod1Estimation
+                                    : userData.personalInfo?.noteCalculeeMethod1}/20
+                            </div>
                         </div>
-                    </div>
-                    <div className="calculation-row">
-                        <div className="calculation-method">{text.calculationMethod2}</div>
-                        <div className="calculation-score">
-                            {userData.personalInfo?.noteAvailability === "estimation"
-                                ? userData.personalInfo?.noteCalculeeMethod2Estimation
-                                : userData.personalInfo?.noteCalculeeMethod2}/20
+                        <div className="calculation-row">
+                            <div className="calculation-method">{text.calculationMethod2}</div>
+                            <div className="calculation-score">
+                                {userData.personalInfo?.noteAvailability === "estimation"
+                                    ? userData.personalInfo?.noteCalculeeMethod2Estimation
+                                    : userData.personalInfo?.noteCalculeeMethod2}/20
+                            </div>
                         </div>
-                    </div>
-                    <div className="calculation-row">
-                        <div className="calculation-method">{text.calculationMethod3}</div>
-                        <div className="calculation-score">
-                            {userData.personalInfo?.noteAvailability === "estimation"
-                                ? userData.personalInfo?.noteCalculeeMethod3Estimation
-                                : userData.personalInfo?.noteCalculeeMethod3}/20
+                        <div className="calculation-row">
+                            <div className="calculation-method">{text.calculationMethod3}</div>
+                            <div className="calculation-score">
+                                {userData.personalInfo?.noteAvailability === "estimation"
+                                    ? userData.personalInfo?.noteCalculeeMethod3Estimation
+                                    : userData.personalInfo?.noteCalculeeMethod3}/20
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* Grouper RIASEC et Personnalité ensemble pour éviter la séparation */}
             <div className="section-group">
@@ -1011,7 +1109,9 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ userData, language = 
                             {Object.entries(userData.riasecScores?.scores || {}).map(([category, score]: [string, any]) => (
                                 <div key={category} className="mb-2">
                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <span className="bold">{category}</span>
+                                        <span className="bold">
+                                            {text[category as keyof typeof text] || category}
+                                        </span>
                                         <span>{score}%</span>
                                     </div>
                                     <div className="bar-container">
@@ -1021,13 +1121,16 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ userData, language = 
                             ))}
                         </div>
                         <div style={{ marginTop: '10px' }}>
-                            <span className="text-secondary">Profil dominant: </span>
-                            <span className="bold">{userData.riasecScores?.dominantProfile?.join('-')}</span>
+                            <span className="text-secondary">{text.profilDominant}: </span>
+                            <span className="bold">
+                                {userData.riasecScores?.dominantProfile?.map(
+                                    (profile: string) => text[profile as keyof typeof text] || profile
+                                ).join('-')}
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                {/* Personality Profile - garder dans le même groupe pour éviter la séparation */}
                 <div className="section avoid-break">
                     <h2 className="section-title">
                         <BrainIcon style={{ verticalAlign: 'middle', width: '18px', height: '18px', marginRight: '5px', display: 'inline' }} />
@@ -1035,19 +1138,72 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ userData, language = 
                     </h2>
                     <div className="card">
                         <div className="grid">
+                            {Object.entries(userData.personalityScores?.scores || {}).map(([trait, score]: [string, any]) => {
+                                // Rechercher la traduction arabe du trait si nécessaire
+                                const traitLabel = language === 'ar'
+                                    ? (text[trait as keyof typeof text] ||
+                                        (trait === "Ouverture" ? "الانفتاح" :
+                                            trait === "Organisation" ? "التنظيم" :
+                                                trait === "Sociabilité" ? "الاجتماعية" :
+                                                    trait === "Gestion du stress" ? "إدارة التوتر" :
+                                                        trait === "Leadership" ? "القيادة" :
+                                                            trait === "Autonomie" ? "الاستقلالية" :
+                                                                trait === "Persévérance" ? "المثابرة" :
+                                                                    trait === "Créativité" ? "الإبداع" :
+                                                                        trait === "Adaptabilité" ? "التكيف" : trait))
+                                    : trait;
+
+                                return (
+                                    <div key={trait} className="mb-2">
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <span className="bold">{traitLabel}</span>
+                                            <span>{score}%</span>
+                                        </div>
+                                        <div className="bar-container">
+                                            <div className="bar bar-personality" style={{ width: `${score}%` }}></div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <div style={{ marginTop: '10px' }}>
+                            <span className="text-secondary">{text.dominantTraits}: </span>
+                            <span className="bold">
+                                {userData.personalityScores?.dominantTraits?.map((trait: string) => {
+                                    return language === 'ar'
+                                        ? (trait === "Ouverture" ? "الانفتاح" :
+                                            trait === "Organisation" ? "التنظيم" :
+                                                trait === "Sociabilité" ? "الاجتماعية" :
+                                                    trait === "Gestion du stress" ? "إدارة التوتر" :
+                                                        trait === "Leadership" ? "القيادة" :
+                                                            trait === "Autonomie" ? "الاستقلالية" :
+                                                                trait === "Persévérance" ? "المثابرة" :
+                                                                    trait === "Créativité" ? "الإبداع" :
+                                                                        trait === "Adaptabilité" ? "التكيف" : trait)
+                                        : trait;
+                                }).join(', ')}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Page Break */}
+                <div className="page-break"></div>
+
+                {/* Aptitudes */}
+
+                <div className="section avoid-break">
+                    <h2 className="section-title">
+                        <BrainIcon style={{ verticalAlign: 'middle', width: '18px', height: '18px', marginRight: '5px', display: 'inline' }} />
+                        {text.aptitudeTitle}
+                    </h2>
+                    <div className="card">
+                        <div className="grid">
                             {Object.entries(userData.aptitudeScores?.scores || {}).map(([aptitude, score]: [string, any]) => (
                                 <div key={aptitude} className="mb-2">
                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                         <span className="bold">
-                                            {aptitude === "logique" ? text.logique :
-                                                aptitude === "spatial" ? text.spatial :
-                                                    aptitude === "numerique" ? text.numerique :
-                                                        aptitude === "abstrait" ? text.abstrait :
-                                                            aptitude === "mecanique" ? text.mecanique :
-                                                                aptitude === "critique" ? text.critique :
-                                                                    aptitude === "culture" ? text.culture :
-                                                                        aptitude === "etudes" ? text.etudes :
-                                                                            aptitude}
+                                            {text[aptitude as keyof typeof text] || aptitude}
                                         </span>
                                         <span>{score}%</span>
                                     </div>
@@ -1058,46 +1214,24 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ userData, language = 
                             ))}
                         </div>
                         <div style={{ marginTop: '10px' }}>
-                            <span className="text-secondary">Score global: </span>
+                            <span className="text-secondary">{text.globalScore}: </span>
                             <span className="bold">{userData.aptitudeScores?.overallScore}%</span>
-                            <span className="text-secondary"> | Niveau: </span>
-                            <span className="bold">{userData.aptitudeScores?.performanceLevel}</span>
+                            <span className="text-secondary"> | {text.level}: </span>
+                            <span className="bold">
+                                {language === 'ar'
+                                    ? userData.aptitudeScores?.performanceLevel === 'excellent' ? 'ممتاز'
+                                        : userData.aptitudeScores?.performanceLevel === 'très bon' ? 'جيد جداً'
+                                            : userData.aptitudeScores?.performanceLevel === 'bon' ? 'جيد'
+                                                : userData.aptitudeScores?.performanceLevel === 'moyen' ? 'متوسط'
+                                                    : userData.aptitudeScores?.performanceLevel === 'faible' ? 'ضعيف'
+                                                        : userData.aptitudeScores?.performanceLevel
+                                    : userData.aptitudeScores?.performanceLevel}
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Page Break */}
-            <div className="page-break"></div>
-
-            {/* Aptitudes */}
-            <div className="section no-break">
-                <h2 className="section-title">
-                    <GraduationCapIcon style={{ verticalAlign: 'middle', width: '18px', height: '18px', marginRight: '5px', display: 'inline' }} />
-                    {text.aptitudes}
-                </h2>
-                <div className="card">
-                    <div className="grid">
-                        {Object.entries(userData.aptitudeScores?.scores || {}).map(([aptitude, score]: [string, any]) => (
-                            <div key={aptitude} className="mb-2">
-                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span className="bold">{aptitude}</span>
-                                    <span>{score}%</span>
-                                </div>
-                                <div className="bar-container">
-                                    <div className="bar bar-aptitude" style={{ width: `${score}%` }}></div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <div style={{ marginTop: '10px' }}>
-                        <span className="text-secondary">Score global: </span>
-                        <span className="bold">{userData.aptitudeScores?.overallScore}%</span>
-                        <span className="text-secondary"> | Niveau: </span>
-                        <span className="bold">{userData.aptitudeScores?.performanceLevel}</span>
-                    </div>
-                </div>
-            </div>
 
             {/* Intérêts académiques avec détails des matières et catégories */}
             <div className="section no-break">
@@ -1432,7 +1566,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ userData, language = 
             <div className="footer">
                 <div>{text.orientationReport} - {userData.personalInfo?.firstName} {userData.personalInfo?.lastName} - {formatDate()}</div>
             </div>
-        </div>
+        </div >
     );
 };
 

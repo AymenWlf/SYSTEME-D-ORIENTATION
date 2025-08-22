@@ -19,7 +19,11 @@ const personalityTraits = {
     "Élevé": "Élevé",
     "Moyen": "Moyen",
     "Faible": "Faible",
-    "Très faible": "Très faible"
+    "Très faible": "Très faible",
+    "Autonomie": "Autonomie",
+    "Persévérance": "Persévérance",
+    "Créativité": "Créativité",
+    "Adaptabilité": "Adaptabilité"
   },
   ar: {
     "Ouverture": "الانفتاح",
@@ -31,7 +35,11 @@ const personalityTraits = {
     "Élevé": "مرتفع",
     "Moyen": "متوسط",
     "Faible": "منخفض",
-    "Très faible": "منخفض جداً"
+    "Très faible": "منخفض جداً",
+    "Autonomie": "الاستقلالية",
+    "Persévérance": "المثابرة",
+    "Créativité": "الإبداع",
+    "Adaptabilité": "التكيف"
   }
 };
 
@@ -48,7 +56,13 @@ const aptitudeTraits = {
     "Élevé": "Élevé",
     "Moyen": "Moyen",
     "Faible": "Faible",
-    "Très faible": "Très faible"
+    "Très faible": "Très faible",
+    "numerique": "Numérique",
+    "abstrait": "Abstrait",
+    "mecanique": "Mécanique",
+    "critique": "Pensée critique",
+    "culture": "Culture générale",
+    "etudes": "Études supérieures"
   },
   ar: {
     "logique": "منطقي",
@@ -61,7 +75,13 @@ const aptitudeTraits = {
     "Élevé": "مرتفع",
     "Moyen": "متوسط",
     "Faible": "منخفض",
-    "Très faible": "منخفض جداً"
+    "Très faible": "منخفض جداً",
+    "numerique": "رقمي",
+    "abstrait": "مجرد",
+    "mecanique": "ميكانيكي",
+    "critique": "تفكير نقدي",
+    "culture": "ثقافة عامة",
+    "etudes": "دراسات عليا"
   }
 };
 

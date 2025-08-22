@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 // Configuration de base d'Axios
-//export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://educalogy.fr/apis';
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/apis';
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://educalogy.fr/apis';
+//export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/apis';
 
 // Instance Axios configurée
 export const apiClient = axios.create({

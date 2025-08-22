@@ -530,6 +530,7 @@ const OrientationReport: React.FC<OrientationReportProps> = ({ userData, languag
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userReportData, setUserReportData] = useState<any>(userData);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   // Récupérer le token d'authentification
   const token = getAuthToken();
@@ -657,6 +658,41 @@ const OrientationReport: React.FC<OrientationReportProps> = ({ userData, languag
 
     return `Vous présentez un profil ${riasec.join('-')} avec des traits de personnalité dominants en ${personality.slice(0, 2).join(' et ')}. Vos intérêts académiques se concentrent sur les domaines à forte compatibilité, avec une orientation vers des études de niveau ${userData.constraints?.educationProfile?.ambitionLevel || 'élevé'}.`;
   };
+
+  // Fonction pour marquer le test comme complété
+  const markTestAsCompleted = async () => {
+    if (!isAuthenticated || !userData || !userData.uuid || isCompleted) {
+      return;
+    }
+
+    try {
+      console.log("Marquage du test comme complété...");
+      const response = await axios.post(
+        `${API_BASE_URL}/orientation-test/completed`,
+        {},
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data.success) {
+        console.log("Test marqué comme complété avec succès:", response.data);
+        setIsCompleted(true);
+      } else {
+        console.error("Erreur lors du marquage du test comme complété:", response.data.message);
+      }
+    } catch (err) {
+      console.error("Erreur lors de la requête pour marquer le test comme complété:", err);
+    }
+  };
+
+  // Déclencher la fonction de completed dès que le composant est monté
+  useEffect(() => {
+    markTestAsCompleted();
+  }, [isAuthenticated, userData?.uuid]); // Se déclenche uniquement si le token ou l'UUID change
 
   const getRecommendations = () => {
     // Recommandations basées sur les résultats
@@ -991,29 +1027,54 @@ const OrientationReport: React.FC<OrientationReportProps> = ({ userData, languag
               </h3>
               <ul className="text-xs sm:text-sm md:text-base space-y-1 sm:space-y-2">
                 <li className={`flex ${language === 'ar' ? 'flex-row-reverse justify-start' : ''}`}>
-                  <span className={`font-medium text-gray-700 ${language === 'ar' ? 'ml-1' : 'mr-1'}`}>{t.name} :</span>
-                  <span className="font-bold">{userData.personalInfo?.firstName} {userData.personalInfo?.lastName}</span>
+                  <span className={`font-medium text-gray-700 ${language === 'ar' ? 'ml-1' : 'mr-1'}`}>
+                    {language === 'ar' ? `${t.name}` : `${t.name} :`}
+                  </span>
+                  <span className="font-bold">
+                    {language === 'ar' ? `: ${userData.personalInfo?.firstName} ${userData.personalInfo?.lastName}` : `${userData.personalInfo?.firstName} ${userData.personalInfo?.lastName}`}
+                  </span>
                 </li>
                 <li className={`flex ${language === 'ar' ? 'flex-row-reverse justify-start' : ''}`}>
-                  <span className={`font-medium text-gray-700 ${language === 'ar' ? 'ml-1' : 'mr-1'}`}>{t.age} :</span>
-                  <span className="font-bold">{userData.personalInfo?.age}</span>
+                  <span className={`font-medium text-gray-700 ${language === 'ar' ? 'ml-1' : 'mr-1'}`}>
+                    {language === 'ar' ? `${t.age}` : `${t.age} :`}
+                  </span>
+                  <span className="font-bold">
+                    {language === 'ar' ? `: ${userData.personalInfo?.age}` : userData.personalInfo?.age}
+                  </span>
                 </li>
                 <li className={`flex ${language === 'ar' ? 'flex-row-reverse justify-start' : ''}`}>
-                  <span className={`font-medium text-gray-700 ${language === 'ar' ? 'ml-1' : 'mr-1'}`}>{t.city} :</span>
-                  <span className="font-bold">{userData.personalInfo?.city}</span>
+                  <span className={`font-medium text-gray-700 ${language === 'ar' ? 'ml-1' : 'mr-1'}`}>
+                    {language === 'ar' ? `${t.city}` : `${t.city} :`}
+                  </span>
+                  <span className="font-bold">
+                    {language === 'ar' ? `: ${userData.personalInfo?.city}` : userData.personalInfo?.city}
+                  </span>
                 </li>
                 <li className={`flex ${language === 'ar' ? 'flex-row-reverse justify-start' : ''}`}>
-                  <span className={`font-medium text-gray-700 ${language === 'ar' ? 'ml-1' : 'mr-1'}`}>{t.studyLevel} :</span>
-                  <span className="font-bold">{userData.personalInfo?.studyLevel}</span>
+                  <span className={`font-medium text-gray-700 ${language === 'ar' ? 'ml-1' : 'mr-1'}`}>
+                    {language === 'ar' ? `${t.studyLevel}` : `${t.studyLevel} :`}
+                  </span>
+                  <span className="font-bold">
+                    {language === 'ar' ? `: ${userData.personalInfo?.studyLevel}` : userData.personalInfo?.studyLevel}
+                  </span>
                 </li>
                 <li className={`flex ${language === 'ar' ? 'flex-row-reverse justify-start' : ''}`}>
-                  <span className={`font-medium text-gray-700 ${language === 'ar' ? 'ml-1' : 'mr-1'}`}>{t.bac} :</span>
-                  <span className="font-bold">{userData.personalInfo?.bacType === "mission" ? "Mission Française" : userData.personalInfo?.bacType}</span>
+                  <span className={`font-medium text-gray-700 ${language === 'ar' ? 'ml-1' : 'mr-1'}`}>
+                    {language === 'ar' ? `${t.bac}` : `${t.bac} :`}
+                  </span>
+                  <span className="font-bold">
+                    {language === 'ar'
+                      ? `: ${userData.personalInfo?.bacType === "mission" ? "Mission Française" : userData.personalInfo?.bacType}`
+                      : userData.personalInfo?.bacType === "mission" ? "Mission Française" : userData.personalInfo?.bacType}
+                  </span>
                 </li>
                 {userData.personalInfo?.bacType === "mission" && (
                   <li className={`flex ${language === 'ar' ? 'flex-row-reverse justify-start' : ''}`}>
-                    <span className={`font-medium text-gray-700 ${language === 'ar' ? 'ml-1' : 'mr-1'}`}>{t.specialties} :</span>
+                    <span className={`font-medium text-gray-700 ${language === 'ar' ? 'ml-1' : 'mr-1'}`}>
+                      {language === 'ar' ? `${t.specialties}` : `${t.specialties} :`}
+                    </span>
                     <span className="font-bold">
+                      {language === 'ar' ? ": " : ""}
                       {userData.personalInfo?.bacSpecialites?.map((spe: string) => {
                         if (spe === "math") return language === 'ar' ? "الرياضيات" : "Mathématiques";
                         if (spe === "pc") return language === 'ar' ? "الفيزياء والكيمياء" : "Physique-Chimie";
@@ -1032,8 +1093,12 @@ const OrientationReport: React.FC<OrientationReportProps> = ({ userData, languag
                 )}
                 {userData.personalInfo?.bacType === "marocain" && (
                   <li className={`flex ${language === 'ar' ? 'flex-row-reverse justify-start' : ''}`}>
-                    <span className={`font-medium text-gray-700 ${language === 'ar' ? 'ml-1' : 'mr-1'}`}>{t.stream} :</span>
-                    <span className="font-bold">{userData.personalInfo?.bacFiliere}</span>
+                    <span className={`font-medium text-gray-700 ${language === 'ar' ? 'ml-1' : 'mr-1'}`}>
+                      {language === 'ar' ? `${t.stream}` : `${t.stream} :`}
+                    </span>
+                    <span className="font-bold">
+                      {language === 'ar' ? `: ${userData.personalInfo?.bacFiliere}` : userData.personalInfo?.bacFiliere}
+                    </span>
                   </li>
                 )}
               </ul>

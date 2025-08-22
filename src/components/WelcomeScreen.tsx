@@ -577,17 +577,30 @@ const WelcomeScreen: React.FC<WelcomeScreenProps> = ({
           // Arrondir à un chiffre après la virgule pour un affichage plus précis
           const progressPercentage = Math.round((completedSectionsCount / totalSteps) * 100);
 
+          // Définir le statut du test
           setTestStatus({
             startedAt: testData.metadata.startedAt,
             lastActivity: testData.completedAt || new Date().toISOString(),
             progressPercentage: progressPercentage,
             completedSections: completedSectionsInt,
-            completedSectionsRaw: completedSectionsCount, // Garder la valeur non arrondie
-            hasPartialSection: hasPartialSection, // Indiquer s'il y a une section partiellement complétée
+            completedSectionsRaw: completedSectionsCount,
+            hasPartialSection: hasPartialSection,
             totalSections: totalSteps,
             isCompleted: isCompleted,
             language: testData.metadata.selectedLanguage || language
           });
+
+          const testLanguage = testData.metadata.selectedLanguage;
+          if (testLanguage && testLanguage !== currentLanguage) {
+            console.log(`Adaptation automatique de la langue: ${currentLanguage} -> ${testLanguage}`);
+            setSelectedLanguage(testLanguage);
+            setCurrentLanguage(testLanguage);
+
+            // Informer le composant parent du changement de langue
+            if (onLanguageChange && typeof onLanguageChange === 'function') {
+              onLanguageChange(testLanguage);
+            }
+          }
 
         }
       } catch (err) {
